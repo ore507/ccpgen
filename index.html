@@ -115,10 +115,30 @@
 <div class="app">
   <aside>
     <h2 style="font-size:14px;margin:4px 0 10px;">設定</h2>
+
+    <!-- 背景画像選択 -->
+    <div class="field">
+      <label>背景画像選択</label>
+      <select id="bgSelect">
+        <option value="background.png">外交部（background.png）</option>
+        <option value="background2.png">国防部（background2.png）</option>
+      </select>
+      <div class="muted">root に置いた 2 種類の背景を切り替え</div>
+    </div>
     
     <div class="field">
       <label>メインテキスト</label>
       <textarea id="text" placeholder="“日本は再び軍国主義の過ちを繰り返すつもりなのか…”"></textarea>
+    </div>
+
+    <!-- 選択部分を金色にするボタン -->
+    <div class="field">
+      <button class="btn" id="highlightGoldBtn" type="button">
+        選択部分を金色（#D8AE5C）にする
+      </button>
+      <div class="muted">
+        テキスト内で範囲選択してから押すと、その部分だけ金色で描画されます。
+      </div>
     </div>
 
     <div class="inline">
@@ -192,13 +212,16 @@
     <div class="canvas-wrap">
       <canvas id="cv"></canvas>
     </div>
-    <footer>背景画像 background.png を使用中。</footer>
+    <footer>背景画像 background.png / background2.png を使用中。</footer>
   </main>
 </div>
 
 <script>
+  const HIGHLIGHT_COLOR = "#D8AE5C";
+
   const els = {
     cv: document.getElementById('cv'),
+    bgSelect: document.getElementById('bgSelect'),
     text: document.getElementById('text'),
     fontSize: document.getElementById('fontSize'),
     lineHeight: document.getElementById('lineHeight'),
@@ -211,19 +234,29 @@
     footerText: document.getElementById('footerText'),
     footerSize: document.getElementById('footerSize'),
     renderBtn: document.getElementById('renderBtn'),
-    saveBtn: document.getElementById('saveBtn')
+    saveBtn: document.getElementById('saveBtn'),
+    highlightGoldBtn: document.getElementById('highlightGoldBtn')
   };
 
-  // 背景画像を固定読み込み
-  let bgImg = new Image();
-  bgImg.onload = () => {
-    // 背景画像に合わせてキャンバスサイズを設定
-    els.cv.width = bgImg.width;
-    els.cv.height = bgImg.height;
-    render();
-  };
-  // index.html と同じディレクトリに置いた background.png を読み込む
-  bgImg.src = "./background.png";
+  // 年月日を「2025年11月13日」形式で返す
+  function formatDateJP(d) {
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${y}年${m}月${day}日`;
+  }
+
+  // 背景読み込み関数
+  let bgImg;
+  function loadBackground(name) {
+    bgImg = new Image();
+    bgImg.onload = () => {
+      els.cv.width = bgImg.width;
+      els.cv.height = bgImg.height;
+      render();
+    };
+    bgImg.src = './' + name;
+  }
 
   // 初期テキスト
   els.text.value =
@@ -231,8 +264,11 @@
     "再び中国人民とアジア人民を敵に回すつもりなのか\n\n" +
     "戦後の国際秩序を覆そうとしているのか";
 
-  els.footerText.value =
-    "中国外交部報道官 2025年11月13日"
+  // footer 初期値（外交部 + 今日）
+  els.footerText.value = "中国外交部報道官 " + formatDateJP(new Date());
+
+  // 初期背景（外交部）
+  loadBackground('background.png');
 
   function getFontFamily() {
     if (els.fontFamily.value === 'serif') {
@@ -241,27 +277,61 @@
     return '"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif';
   }
 
-  // 行分割（日本語向けに単純に文字単位で折り返し）
-  function wrapText(ctx, text, maxWidth) {
-    const result = [];
-    const paragraphs = text.split(/\n{2,}/);
-    for (const para of paragraphs) {
-      const chars = para.replace(/\n/g, '\u200b').split('');
-      let line = "";
-      for (const ch of chars) {
-        const test = line + ch;
-        if (ctx.measureText(test).width > maxWidth && line !== "") {
-          result.push(line);
-          line = ch;
-        } else {
-          line = test;
-        }
+  // [g]...[/g] を解析して色付きトークン列に変換
+  function parseTokens(text, baseColor, highlightColor) {
+    const tokens = [];
+    let i = 0;
+    let currentColor = baseColor;
+    while (i < text.length) {
+      if (text.startsWith("[g]", i)) {
+        currentColor = highlightColor;
+        i += 3;
+        continue;
       }
-      if (line) result.push(line);
-      result.push(""); // 段落間の空行
+      if (text.startsWith("[/g]", i)) {
+        currentColor = baseColor;
+        i += 4;
+        continue;
+      }
+      const ch = text[i];
+      tokens.push({ char: ch, color: currentColor });
+      i++;
     }
-    if (result[result.length - 1] === "") result.pop();
-    return result;
+    return tokens;
+  }
+
+  // トークン列を行ごとに分割（自動折り返し）
+  function layoutTokens(ctx, tokens, maxWidth) {
+    const lines = [];
+    let currentTokens = [];
+    let currentWidth = 0;
+
+    for (const t of tokens) {
+      if (t.char === "\n") {
+        // 改行で行を確定
+        lines.push({ tokens: currentTokens, width: currentWidth });
+        currentTokens = [];
+        currentWidth = 0;
+        continue;
+      }
+
+      const w = ctx.measureText(t.char).width;
+      if (currentWidth + w > maxWidth && currentTokens.length > 0) {
+        // 折り返し
+        lines.push({ tokens: currentTokens, width: currentWidth });
+        currentTokens = [t];
+        currentWidth = w;
+      } else {
+        currentTokens.push(t);
+        currentWidth += w;
+      }
+    }
+
+    if (currentTokens.length > 0) {
+      lines.push({ tokens: currentTokens, width: currentWidth });
+    }
+
+    return lines;
   }
 
   function render() {
@@ -285,37 +355,38 @@
     const lineHeight = parseFloat(els.lineHeight.value) || 1.25;
     const marginX = (parseFloat(els.marginX.value) || 10) / 100;
     const startYRatio = (parseFloat(els.startY.value) || 20) / 100;
-    const color = els.textColor.value || "#ffffff";
+    const baseColor = els.textColor.value || "#ffffff";
     const shadowBlur = parseInt(els.shadowBlur.value, 10) || 0;
 
     const areaX = W * marginX;
     const areaW = W - areaX * 2;
     const startY = H * startYRatio;
 
-    // 本文
-    let text = els.text.value.trim();
-    if (els.quoteMode.value === "both" && text) {
-      text = "“" + text + "”";
+    // 本文（引用符＋トークン化）
+    let raw = els.text.value;
+    if (els.quoteMode.value === "both" && raw.trim()) {
+      raw = "“" + raw + "”";
     }
 
     ctx.save();
-    ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    ctx.fillStyle = color;
     ctx.shadowColor = "rgba(0,0,0,0.85)";
     ctx.shadowBlur = shadowBlur;
     ctx.font = `700 ${fontSize}px ${getFontFamily()}`;
 
-    const lines = wrapText(ctx, text, areaW);
+    const tokens = parseTokens(raw, baseColor, HIGHLIGHT_COLOR);
+    const lines = layoutTokens(ctx, tokens, areaW);
     const linePx = fontSize * lineHeight;
 
     let y = startY;
     for (const line of lines) {
-      if (line === "") {
-        y += linePx * 0.7;
-        continue;
+      const xStart = (W - line.width) / 2;
+      let x = xStart;
+      for (const t of line.tokens) {
+        ctx.fillStyle = t.color;
+        ctx.fillText(t.char, x, y);
+        x += ctx.measureText(t.char).width;
       }
-      ctx.fillText(line, W / 2, y);
       y += linePx;
     }
     ctx.restore();
@@ -330,7 +401,7 @@
       ctx.font = `500 ${fSize}px ${getFontFamily()}`;
       ctx.textBaseline = "alphabetic";
       ctx.textAlign = "center";
-      ctx.fillStyle = color;
+      ctx.fillStyle = baseColor;
       ctx.shadowColor = "rgba(0,0,0,0.9)";
       ctx.shadowBlur = shadowBlur;
 
@@ -347,6 +418,41 @@
     }
   }
 
+  // 背景切り替えイベント
+  els.bgSelect.addEventListener('change', () => {
+    const selected = els.bgSelect.value;
+    loadBackground(selected);
+    const today = formatDateJP(new Date());
+    if (selected === 'background2.png') {
+      els.footerText.value = `中国国防部報道官 ${today}`;
+    } else {
+      els.footerText.value = `中国外交部報道官 ${today}`;
+    }
+    render();
+  });
+
+  // テキスト選択部分を [g]…[/g] で囲んで金色にする
+  els.highlightGoldBtn.addEventListener('click', () => {
+    const ta = els.text;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    if (start === end) return; // 選択なし
+
+    const value = ta.value;
+    const before = value.slice(0, start);
+    const selected = value.slice(start, end);
+    const after = value.slice(end);
+
+    ta.value = before + "[g]" + selected + "[/g]" + after;
+
+    // 一応カーソルをハイライト末尾に移動
+    const newPos = before.length + "[g]".length + selected.length + "[/g]".length;
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = newPos;
+
+    render();
+  });
+
   // 入力のたびに再描画
   [
     "text","fontSize","lineHeight","marginX","startY",
@@ -359,11 +465,31 @@
   els.renderBtn.addEventListener("click", render);
 
   els.saveBtn.addEventListener("click", () => {
-    const url = els.cv.toDataURL("image/png");
+  const src = els.cv; // 元キャンバス
+
+  // ★ 保存用の低解像度キャンバス作成
+  const scale = 0.5;  // ← 解像度 50%（お好みで 0.3〜0.7 に変更可）
+  const w = src.width * scale;
+  const h = src.height * scale;
+
+  const off = document.createElement("canvas");
+  off.width = w;
+  off.height = h;
+
+  const offCtx = off.getContext("2d");
+  offCtx.drawImage(src, 0, 0, w, h);
+
+  // ★ JPEG で保存（超高速）
+  off.toBlob((blob) => {
+    if (!blob) return;
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "propaganda.png";
+    a.download = "propaganda_lowres.jpg";
     a.click();
+    URL.revokeObjectURL(url);
+  }, "image/jpeg", 0.92);
   });
 
   // 初期描画（背景読み込み前は赤ベタ＋テキスト、読み込み後に自動で再描画）
@@ -371,6 +497,3 @@
 </script>
 </body>
 </html>
-
-
-
