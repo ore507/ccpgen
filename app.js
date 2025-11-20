@@ -16,6 +16,9 @@ function loadEmojiFont() {
 async function initI18next() {
   i18nextInstance = i18next.createInstance();
   
+  // Available languages
+  const availableLanguages = ['ja', 'en', 'zh-Hant', 'zh-Hans', 'ko'];
+  
   await i18nextInstance
     .use(i18nextBrowserLanguageDetector)
     .init({
@@ -40,25 +43,57 @@ async function initI18next() {
       }
     });
   
+  // Normalize language code to match available options
+  let detectedLang = i18nextInstance.language;
+  // Handle language codes like 'en-US' -> 'en', 'zh-TW' -> 'zh-Hant', etc.
+  if (detectedLang.startsWith('en')) {
+    detectedLang = 'en';
+  } else if (detectedLang.startsWith('zh')) {
+    // Try to map Chinese variants
+    if (detectedLang.includes('TW') || detectedLang.includes('Hant') || detectedLang === 'zh-Hant') {
+      detectedLang = 'zh-Hant';
+    } else if (detectedLang.includes('CN') || detectedLang.includes('Hans') || detectedLang === 'zh-Hans') {
+      detectedLang = 'zh-Hans';
+    } else {
+      // Default to Traditional Chinese if can't determine
+      detectedLang = 'zh-Hant';
+    }
+  } else if (detectedLang.startsWith('ko')) {
+    detectedLang = 'ko';
+  } else if (detectedLang.startsWith('ja')) {
+    detectedLang = 'ja';
+  }
+  
+  // Ensure the detected language is in available languages, otherwise use fallback
+  if (!availableLanguages.includes(detectedLang)) {
+    detectedLang = 'ja';
+  }
+  
+  // Set the language if it's different from detected
+  if (detectedLang !== i18nextInstance.language) {
+    await i18nextInstance.changeLanguage(detectedLang);
+  }
+  
   // Update UI with translations
   updateTranslations();
   
   // Setup language selector
   const langSelect = document.getElementById('languageSelect');
   if (langSelect) {
-    langSelect.value = i18nextInstance.language;
-  langSelect.addEventListener('change', (e) => {
-    i18nextInstance.changeLanguage(e.target.value).then(() => {
-      updateTranslations();
-      updateSelectOptions();
-      // Update text based on current background and new language
-      updateInitialText();
-      updateFooterText();
-      // Update flag names based on new language
-      populateFlagSelects();
-      render();
+    // Ensure the select value matches the current language
+    langSelect.value = detectedLang;
+    langSelect.addEventListener('change', (e) => {
+      i18nextInstance.changeLanguage(e.target.value).then(() => {
+        updateTranslations();
+        updateSelectOptions();
+        // Update text based on current background and new language
+        updateInitialText();
+        updateFooterText();
+        // Update flag names based on new language
+        populateFlagSelects();
+        render();
+      });
     });
-  });
   }
 }
 
@@ -152,6 +187,8 @@ const FLAG_DEFAULT_CODES = { flag1: 'CN', flag2: 'JP' };
 const BACKGROUND_TYPES = {
   FOREIGN_AFFAIRS: 'background.png',
   FOREIGN_AFFAIRS2: 'background1.png',
+  FOREIGN_AFFAIRS3: 'background1.1.png',
+  FOREIGN_AFFAIRS4: 'background1.2.png',
   DEFENSE: 'background2.png',
   MAO_NING: 'background3.png'
 };
@@ -160,6 +197,8 @@ function getFooterPrefixes() {
   return {
     FOREIGN_AFFAIRS: i18nextInstance ? i18nextInstance.t('footerForeignAffairs') : '中国外交部報道官',
     FOREIGN_AFFAIRS2: i18nextInstance ? i18nextInstance.t('footerForeignAffairs2') : '中国外交部報道官',
+    FOREIGN_AFFAIRS3: i18nextInstance ? i18nextInstance.t('footerForeignAffairs2') : '中国外交部報道官',
+    FOREIGN_AFFAIRS4: i18nextInstance ? i18nextInstance.t('footerForeignAffairs2') : '中国外交部報道官',
     DEFENSE: i18nextInstance ? i18nextInstance.t('footerDefense') : '中国国防部報道官'
   };
 }
@@ -193,6 +232,7 @@ function initializeDOMElements() {
     marginX: document.getElementById('marginX'),
     startY: document.getElementById('startY'),
     textColor: document.getElementById('textColor'),
+    highlightColor: document.getElementById('highlightColor'),
     shadowBlur: document.getElementById('shadowBlur'),
     fontFamily: document.getElementById('fontFamily'),
     quoteMode: document.getElementById('quoteMode'),
@@ -513,7 +553,8 @@ function drawMainText(ctx, width, height) {
   
   // 一時的にフォントを設定してトークンを解析
   ctx.font = `700 ${baseFontSize}px ${fontFamily}`;
-  const tokens = parseTokens(raw, baseColor, HIGHLIGHT_COLOR);
+  const highlightColor = els.highlightColor ? els.highlightColor.value : HIGHLIGHT_COLOR;
+  const tokens = parseTokens(raw, baseColor, highlightColor);
   
   // 最適なフォントサイズを計算
   const { fontSize, lines } = calculateOptimalFontSize(
@@ -659,11 +700,30 @@ function handleSaveImage() {
   }, "image/jpeg", 0.92);
 }
 
+// Settings Panel Toggle Functions
+function openSettingsPanel() {
+  const panel = document.getElementById('settingsPanel');
+  const overlay = document.getElementById('settingsOverlay');
+  if (panel) panel.classList.add('active');
+  if (overlay) overlay.classList.add('active');
+  // Prevent body scroll when panel is open on mobile
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSettingsPanel() {
+  const panel = document.getElementById('settingsPanel');
+  const overlay = document.getElementById('settingsOverlay');
+  if (panel) panel.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
 // Event Listeners Setup
 function setupEventListeners() {
   const renderTriggerIds = [
     "text", "fontSize", "lineHeight", "marginX", "startY",
-    "textColor", "shadowBlur", "fontFamily", "quoteMode",
+    "textColor", "highlightColor", "shadowBlur", "fontFamily", "quoteMode",
     "footerText", "footerSize", "flag1", "flag2"
   ];
 
@@ -685,6 +745,21 @@ function setupEventListeners() {
   }
   if (els.saveBtn) {
     els.saveBtn.addEventListener("click", handleSaveImage);
+  }
+  
+  // Settings panel toggle
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsClose = document.getElementById('settingsClose');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  
+  if (settingsToggle) {
+    settingsToggle.addEventListener('click', openSettingsPanel);
+  }
+  if (settingsClose) {
+    settingsClose.addEventListener('click', closeSettingsPanel);
+  }
+  if (settingsOverlay) {
+    settingsOverlay.addEventListener('click', closeSettingsPanel);
   }
 }
 
@@ -726,6 +801,11 @@ window.onload = async () => {
   await waitForEmojiFont();
   if (els.cv) {
     render();
+  }
+  
+  // Open settings panel automatically on mobile devices
+  if (window.innerWidth <= 900) {
+    openSettingsPanel();
   }
 };
 
